@@ -1,0 +1,54 @@
+
+import csv
+
+neighborhoods = []
+monday = 0
+tuesday = 0
+wedensday = 0
+thursday = 0
+friday = 0
+
+def sweep_times(street_name):
+	with open('sweep.csv') as f:
+		my_reader = csv.reader(f)
+
+
+	for row in my_reader:
+		neighborhood = row[-2]
+		if neighborhood not in neighborhoods:
+			neighborhoods.append(neighborhood)
+
+		# if row[1] == "Mon":
+		# 	monday += 1
+		# if row[1] == "Tues":
+		# 	tuesday += 1
+		# if row[1] == "Wed":
+		# 	wedensday += 1
+		# if row[1] == "Thu":
+		# 	thursday += 1
+		# if row[1] == "Fri":
+		# 	friday += 1
+
+		if row[5] == "Sutter St":
+			
+			print "The left side of the {} block of Sutter Street".format(row[14:16]) \
+				+ " is swept on {}".format(row[1]) + " between the times of {}".format(row[6:8])
+
+			print "The right side of the {} block of Sutter Street".format(row[16:18]) \
+				+ " is swept on {}".format(row[1]) + " between the times of {}".format(row[6:8])
+			
+sweep_times("Sutter St")
+
+
+
+# def  print_hello(name):
+# 	print "Hello, {name}".format(name=name)
+
+# print_hello("Lady Gaga")
+# print_hello("Benedict Cumberbatch")
+
+
+# def many_things(one, two, three, four, five, six):
+#     print "I have one {one}, two {two}s, three {three}s, four {four}s, five {five}s and six {six}s.".format(one=one, two=two, three=three, four=four, five=five, six=six)
+
+# many_things("nose", "ear", "piercing", "limb", "sense", "cousin")
