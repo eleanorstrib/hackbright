@@ -1,12 +1,16 @@
 import random
 import requests
-#source_places = [('New York', 'NY'), ('San Francisco', 'CA'), ('Seattle', 'WA'), ('Houston', 'TX')]
-# ny = source_places[0]
-# print ny[0]
-# print ny[1]
+from twilio.rest import TwilioRestClient
 
+# Your Account Sid and Auth Token from twilio.com/user/account
+account_sid = "ACfd28ac16c257b7849021fd7b008997fd"
+auth_token = "47e3fb75cea6054f3db2779a98cb313d"
+client = TwilioRestClient(account_sid, auth_token)
+
+
+#Weather underground API
 BASE_URL_Forecast_10day = 'http://api.wunderground.com/api/63577728b0e9ae1f/forecast10day/q/'
-source_places = [('New York', 'NY'), ('San Francisco', 'CA'), ('Seattle', 'WA'), ('Houston', 'TX'), ]
+source_places = [('San Francisco', 'CA')]
 
 
 	
@@ -47,3 +51,23 @@ def random_weather_forecast(state, city):
 
 (state, city) = random_location()
 random_weather_forecast(state, city)
+
+
+
+#Twilio  Texting function 
+number ="+15102201256"
+
+
+def generate_message():
+	message = forecast(state, city)
+	return message
+
+
+def text_this(number, message, test=False):
+	#sends a message to the number supplied
+	message = client.messages.create(body=message, to=number, # Replace phone number
+	from_="+19252593131") # Replace Twilio number
+	print message.sid
+
+message = generate_message()
+text_this(number, message)
