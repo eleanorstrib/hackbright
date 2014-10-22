@@ -2,9 +2,9 @@ import csv
 import time
 from datetime import datetime
 
-oakland_site_match_list = {}
-berkeley_site_match_list = {}
-unmatched_tutors_list = {}
+oakland_site_match_list = []
+berkeley_site_match_list = []
+unmatched_tutors_list = []
 
 
 def tutors_who_travel():
@@ -37,7 +37,7 @@ tutors_who_travel()
 
 
 """  	
-compares workstudy/credit tutors's availability with site's times to check tutor 
+#compares workstudy/credit tutors's availability with site's times to check tutor 
 can work at least 2 days on site.
 def workstudy_credit_tutors():
 
@@ -45,12 +45,12 @@ def workstudy_credit_tutors():
 		if row[16] == "Work-study":
 			
 			create dictionary of tutors availability
-			 tutor_availabilty = {}
+			 tutor_availabilty = []
 
 
 			for row in site_times:
 				create dictionary of site's availability
-				site_hours = {}
+				site_hours = []
 
 				if tutor_availabilty == site_hours:
 					tutor_matches_site = 0
@@ -72,8 +72,6 @@ def oakland_site_finder():
 		site_times = csv.reader(g)
 
 		for row in site_times:
-
-
 			if row[1] == "Oakland":		
 				oakland_sites = row[0]
 				oakland_sites_list = []
@@ -86,22 +84,22 @@ oakland_site_finder()
 compares tutor preferences availability with site's times
 
 	for row in my_reader:
-		create dictionary of tutors availability
+		#create dictionary of tutors availability
 			 tutor_availabilty = {}
 
-		create list of tutor preferences
+		#create list of tutor preferences
 			tutor_preferences = {}
 
 
 		for row in site_times:
-				create dictionary of site's availability
+				#create dictionary of site's availability
 				site_hours = {}
 
 		if tutor_preferences row[17:20] = True:
 
 			for tutor_preferences in site_hours:
 
-					if tutor_preferences row[17:20] == site + tutor_availabilty == site_times:
+					if tutor_preferences row[17:20] == site && tutor_availabilty == site_times:
 						return 
 
 
@@ -112,13 +110,13 @@ tutor_preferences_match()
 """
 compares tutor_availabilty & site availability
 
-			create dictionary of tutors availability
-			 tutor_availabilty = {}
+			create list of tutors availability
+			 tutor_availabilty = []
 
 
 			for row in site_times:
 				create dictionary of site's availability
-				site_hours = {}
+				site_hours = []
 
 			if tutor_availabilty = site_hours
 
@@ -132,7 +130,7 @@ compares tutor_availabilty & site availability
 
 """
 
-with open('BUILD_SiteTimes.csv') as d:
-    build = csv.DictReader(d)
-    for site_name in build:
-        print site_name
+# with open('BUILD_SiteTimes.csv') as d:
+#     build = csv.DictReader(d)
+#     for site_name in build:
+#         print site_name

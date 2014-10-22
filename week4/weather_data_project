@@ -1,0 +1,53 @@
+import requests
+
+
+# print r.status_code
+# print r.json()
+
+
+# j = r.json()
+# temperature = j['current_observation']['temperature_string']
+# print temperature
+
+
+BASE_URL = 'http://api.wunderground.com/api/63577728b0e9ae1f/conditions/q/'
+BASE_URL_Forecast_10day = 'http://api.wunderground.com/api/63577728b0e9ae1f/forecast10day/q/'
+
+
+def get_api_url(state, city):
+    city = city.replace(" ", "_")
+    return "{}/{}/{}.json".format(BASE_URL, state, city)
+    
+# test
+print get_api_url("CA", "San Francisco")
+print get_api_url("NY", "New York")
+
+def current_weather(state, city):
+#fetches current weather data from Weather Underground's JSON API
+	url = get_api_url(state, city)
+	r = requests.get(url)
+	j = r.json()
+	temperature = j['current_observation']['temperature_string']
+	
+	return temperature
+
+current_weather("CA", "San Francisco")
+
+
+def get_api_url_forecast(state, city):
+    city = city.replace(" ", "_")
+    return "{}/{}/{}.json".format(BASE_URL_Forecast_10day, state, city)
+
+def forecast(state, city):
+	url = get_api_url_forecast(state, city)
+	r = requests.get(url)
+	j = r.json()
+	days = j['forecast']['txt_forecast']['forecastday']
+
+	for day in days:
+	    print city, "--", day['title'], ": ", day['fcttext']
+	    icon = day['icon']
+	    if "rain" in icon:
+	    	print icon, " bring an umbrella!"
+
+forecast("NY", "New York")
