@@ -1,5 +1,6 @@
 # pip install requests
 # pip install requests-oauthlib
+from pprint import pprint
 
 # API secrets. NEVER share these with anyone!
 CLIENT_KEY = "Ogw2gicyhME2qlGHzr0rDsEHe"
@@ -105,4 +106,6 @@ def main():
 if __name__=="__main__":
     main()
 
-    
+
+
+pprint(json_response)
