@@ -1,6 +1,6 @@
-# pip install requests
-# pip install requests-oauthlib
-from pprint import pprint
+#pip install requests
+#pip install requests-oauthlib
+
 
 # API secrets. NEVER share these with anyone!
 CLIENT_KEY = "Ogw2gicyhME2qlGHzr0rDsEHe"
@@ -12,13 +12,15 @@ REQUEST_TOKEN_URL = API_URL + "/oauth/request_token"
 AUTHORIZE_URL = API_URL + "/oauth/authorize?oauth_token={request_token}"
 ACCESS_TOKEN_URL = API_URL + "/oauth/access_token"
 TIMELINE_URL = API_URL + "/1.1/statuses/home_timeline.json"
-
+TWEET_URL = API_URL + "/1.1/statuses/update.json"
+status_message = "What's the weather like in San Francisco?"
 
 
 import urlparse
 import json
 import requests
 from requests_oauthlib import OAuth1
+from pprint import pprint
 
 
 def get_request_token():
@@ -44,6 +46,8 @@ def get_access_token(request_token, request_secret, verifier):
                    verifier=verifier)
 
     response = requests.post(ACCESS_TOKEN_URL, auth=oauth)
+    #print response.json()
+
     credentials = urlparse.parse_qs(response.content)
     access_token = credentials.get('oauth_token')[0]
     access_secret = credentials.get('oauth_token_secret')[0]
@@ -93,19 +97,39 @@ def authorize():
                    resource_owner_secret=access_secret)
     return oauth
 
+def print_tweets_on_mytimeline(auth):
+    timeline_tweets = requests.get("https://api.twitter.com/1.1/statuses/home_timeline.json?count=5", auth=auth).json()
+    #print timeline_tweets["description"]
+    #print "Joe's score is %d" % timeline_tweets["description"]
+    #return timeline_tweets
+    #print "{} tweeted -- {} -- on my timeline".format(name, description)
+    pprint(timeline_tweets)
 
+def print_twitter_user_tweets(auth):
+    twitter_user_tweets = requests.get("https://api.twitter.com/1.1/users/show.json?screen_name=jennielees", auth=auth).json()
+    tweets = twitter_user_tweets['user']['screen_name']
+    pprint(twitter_user_tweets)
+    print "Jennie says {}".format(tweets)
+
+def make_tweet(auth, status_message):
+    data = { 'status': "this is a tweet" }
+    response = requests.post(TWEET_URL, data=data, auth=auth)
+    return response
+   
 
 def main():
     """ Main function """
     auth = authorize()
+    print_tweets_on_mytimeline(auth)
+    make_tweet(auth, status_message)
+    print_twitter_user_tweets(auth)
 
     response = requests.get(TIMELINE_URL, auth=auth)
-    print json.dumps(response.json(), indent=4)
+    return json.dumps(response.json(), indent=4)
+
 
 
 if __name__=="__main__":
-    main()
+        main()
 
 
-
-pprint(json_response)

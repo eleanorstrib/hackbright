@@ -14,12 +14,12 @@ oops = leet_skillz.get('callofduty')
 print awesome
 print oops
 
-best_game_ever = "dominion"
-leet_skillz[best_game_ever] = 4
+# best_game_ever = "dominion"
+# leet_skillz[best_game_ever] = 4
 
-print leet_skillz
+# print leet_skillz
 
-for game in leet_skillz:
-		print "looking at {}".format(game)
-		skill = leet_skillz[game]
+# for game in leet_skillz:
+# 		print "looking at {}".format(game)
+# 		skill = leet_skillz[game]
 		

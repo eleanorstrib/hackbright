@@ -12,7 +12,6 @@ client = TwilioRestClient(account_sid, auth_token)
 BASE_URL_Forecast_10day = 'http://api.wunderground.com/api/63577728b0e9ae1f/forecast10day/q/'
 source_places = [('San Francisco', 'CA')]
 
-
 	
 def get_api_url_forecast(state, city):
 	#formats forecast data from API to be used in def forecast function
@@ -45,7 +44,7 @@ def random_location():
 
 def random_weather_forecast(state, city):
 	'''applies random city choice to the forecast functions
-	to generate the weather report for the randomly chosen city'''
+	to generate the weather report for San Francisco'''
 	the_weather = forecast(state, city)
 	return the_weather
 
