@@ -1,47 +1,63 @@
-BAM = {
-	'Mon': (315, 500),
-	'Tue': (315, 500),
-	'Wed': (315, 500),
-	'Thur': (315, 500),
-	'Fri': (0, 0)	
-	}
+import csv
+import datetime
 
-Cragmont = {
-	'Mon': (1530, 1700),
-	'Tue': (1530, 1700),
-	'Wed': (1530, 1700),
-	'Thu': (1530, 1700),
-	'Fri': (0, 0),
-}
+days = ["Monday", "Tuesday", "Wedensday", "Thursday", "Friday"]
 
-Emerson_Berkeley = {
-	'Mon': (200, 400),
-	'Tue': (200, 400),
-	'Wed': (200, 400),
-	'Thu': (200, 400),
-	'Fri': (12:45, 245)
+def strtime_to_minutes(strtime):
+	parts = strtime.split(':')
+	l = len(parts)
+	if l == 2 or l==3 : return int(parts[0])*60 + int(parts[1])
+	return -1
+	
+def overlap(interval1, interval2):
+	pass
 
-}
+def total_overlap(schedule1, schedule2):
+	pass
 
-Jefferson =
-{
-	'Mon': (230, 430),
-	'Tue': (0, 0),
-	'Wed': (230, 430),
-	'Thu': (0, 0),
-	'Fri': (230, 430)
 
-}
 
-tutors = {
-{'Samantha Rocha': {'Mon': (100, 600),	
-					'Tue': (0, 0),
-					'Wed': (100, 600),
-					'Thu': (100, 300),
-					'Fri': (0, 0)},
-{'Cheyenne Warren'	{'Mon': (100, 600),
-					'Tue': (0, 0),	
-					'Wed': (330, 600), 
-					'Thu': (0, 0),	
-					'Fri': (100, 600)}
-}
+
+	
+
+
+print strtime_to_minutes("10:30")
+print strtime_to_minutes("blah")
+	
+
+
+with open('BUILD_DataTest2.csv') as f1:
+	tutors = csv.DictReader(f1)
+	fn1= tutors.fieldnames
+	print fn1
+	print tutors.next()
+
+
+	for tutor in tutors:
+		tutor_start = []
+
+		tutor_start.extend([tutor["Monday Start Time"], tutor["Tuesday Start Time"], tutor["Wednesday Start Time"], tutor["Thursday Start Time"], tutor["Friday Start Time"]])
+		
+		tutor_end = []
+		tutor_end.extend([tutor["Monday End Time"], tutor["Tuesday End Time"], tutor["Wednesday End Time"], tutor["Thursday End Time"], tutor["Friday End Time"]])
+		tutor_avail = zip( map(strtime_to_minutes,tutor_start), map(strtime_to_minutes,tutor_end ) )
+
+		print tutor['Last Name'], ":", tutor_avail
+
+
+with open('BUILD_SiteTimes2.csv') as f2:
+	site_times = csv.DictReader(f2)
+	fn= site_times.fieldnames
+	print fn
+
+	for site in site_times:
+
+		site_start = []
+		site_start.extend([site["Monday Start Time"], site["Tuesday Start Time"], site["Wednesday Start Time"], site["Thursday Start Time"], site["Friday Start Time"]])
+		
+		site_end = []
+		site_end.extend([site["Monday End Time"], site["Tuesday End Time"], site["Wednesday End Time"], site["Thursday End Time"], site["Friday End Time"]])
+		site_avail = zip(site_start, site_end)
+
+		print site['site_name'], ":", site_avail
+

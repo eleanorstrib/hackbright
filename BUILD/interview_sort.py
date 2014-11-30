@@ -2,33 +2,7 @@ import csv
 import time
 from datetime import datetime
 
-tutors = {
-'Samantha Rocha': {'Mon': (100, 600),
-					'Tue': (0, 0),
-					'Wed': (100, 600),
-					'Thu': (100, 300),
-					'Fri': (0, 0)
-					}
-		}
-
-
-Emerson_Berkeley = {
-	'Mon': (200, 400),
-	'Tue': (200, 400),
-	'Wed': (200, 400),
-	'Thu': (200, 400),
-	'Fri': (100, 245)
-
-}
-
-Jefferson = {
-	'Mon': (230, 430),
-	'Tue': (0, 0),
-	'Wed': (230, 430),
-	'Thu': (0, 0),
-	'Fri': (230, 430)
-}
-# weekdays = ["Monday", "Tuesday", "Wedensday", "Thursday", "Friday"]
+days = ["Monday", "Tuesday", "Wedensday", "Thursday", "Friday"]
 
 
 
@@ -66,21 +40,21 @@ def oakland_site_finder():
 		site_times = csv.DictReader(g)
 
 		for site in site_times:
+			site_avail = {}
 			if site['city'] == "Oakland":
 				print site['site_name'], site['Monday Start Time'], site['Monday End Time']
 			print site_times.next()
 
 
-
 def Berkeley_Arts_Magnet():
-	BAM = {
-		'Mon': (315, 500),
-		'Tue': (315, 500),
-		'Wed': (315, 500),
-		'Thu': (315, 500),
-		'Fri': (0, 0)	
-		}
-	
+	with open('BUILD_SiteTimes2.csv') as g:
+		site_times = csv.Reader(g)
+		BAM_avail = {}		
+		for site from site_times
+			start_time = []
+			start_time = list.site['Mond']
+			BAM_avail = dict.fromkeys(days)
+
 	print xrange(BAM['Mon'][0])
 	print tutors.fromkeys()
 
@@ -90,16 +64,10 @@ def Berkeley_Arts_Magnet():
 def main():
 	print "Welcome to BUILD's Sort-o-Matic!"
 
-	oakland_site_finder()
-	tutors_who_travel()
+	
 	Berkeley_Arts_Magnet()
     
 
 
 if __name__=="__main__":
-    main()
-
-# with open('BUILD_SiteTimes.csv') as d:
-#     build = csv.DictReader(d)
-#     for site_name in build:
-#         print site_name
+    main()h
