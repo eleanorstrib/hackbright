@@ -9,9 +9,8 @@ def Prospective_Tutors():
 	creates tuples of day, start/end time ranges"""
 	with open('BUILD_DataTest2.csv') as f1:
 		tutors = csv.DictReader(f1)
-		fn = tutors.fieldnames
-		print fn
-		print tutors.next()
+		#fn = tutors.fieldnames
+
 		tutor_avail = {}
 
 		for tutor in tutors:
@@ -95,14 +94,10 @@ def total_overlap(schedule1, schedule2):
 	for day1, day2 in zip(schedule1, schedule2):
 		#print day1, day2
 		t = overlap(day1, day2)
-		if t < 60: t = 0
+		if t < 60: 
+			t = 0
 		total += t
 	return total
-
-
-
-
-
 
 	# if take_overlap >= 60:
 	# 	hours_overlap = divmod(take_overlap, 60)
@@ -119,17 +114,25 @@ def main():
 	print "Welcome to BUILD's Sort-o-Matic!"
 	tutor_avail = Prospective_Tutors()
 	site_avail = BUILD_sites()
-	print tutor_avail
+
+
 
 	for site, site_schedule in site_avail.items():
 		times = []
 		for tutor, tutor_schedule in tutor_avail.items():
-			#print tutor, " : ", site, " : ", total_overlap(tutor_schedule, site_schedule)
 			t = total_overlap(tutor_schedule, site_schedule)
-			times.append((tutor, t))
-		print times
+			if t > 60: 
+				times.append((tutor, t))
+			
+
+		
 		stimes = sorted(times, key=itemgetter(1), reverse=True)
-		print site, stimes
+
+
+		
+		print site, ": ", stimes
+
+
 
 
 if __name__=="__main__":
