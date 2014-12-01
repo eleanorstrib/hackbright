@@ -123,11 +123,10 @@ def main():
 			t = total_overlap(tutor_schedule, site_schedule)
 			if t > 60: 
 				times.append((tutor, t))
-			
 
-		
+
+
 		stimes = sorted(times, key=itemgetter(1), reverse=True)
-
 
 		
 		print site, ": ", stimes
