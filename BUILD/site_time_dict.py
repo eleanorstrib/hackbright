@@ -93,7 +93,8 @@ def sorting_sites(site_avail,tutor_avail):
 				
 
 		stimes = sorted(times, key=itemgetter(1), reverse=True)
-			
+
+	
 		print site, ": ", stimes
 
 
