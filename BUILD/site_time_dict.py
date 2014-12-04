@@ -5,26 +5,33 @@ from flask import Flask, render_template, request, jsonify
 # Include the Dropbox SDK
 import dropbox
 
+# Initialize the app. launches flask server.
+app = Flask(__name__) 
 
+#Get your app key and secret from the Dropbox developer website
+app_key = 'pxb85nvmkunftb2'
+app_secret = 'jls2d3kb3dt1lmj'
 
-# app = Flask(__name__) # Initialize the app. launches server.
+flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
+authorize_url = flow.start()
+
 
 
 #Flask functions
-# @app.route('/')
-# def hello_world():
-#     return "Welcome to BUILD's Sort-o-matic!"
+@app.route('/')
+def hello_world():
+    return "Welcome to BUILD's Sort-o-matic!"
 
-# def shutdown_server():
-#     func = request.environ.get('werkzeug.server.shutdown')
-#     if func is None:
-#         raise RuntimeError('Not running with the Werkzeug Server')
-#     func()
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
-# @app.route('/shutdown', methods=['POST'])
-# def shutdown():
-#     shutdown_server()
-#     return 'Server shutting down...'
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 #Sort-o-Matic's functions
 
@@ -164,14 +171,9 @@ def output_csv(stimes):
 
 		#writer.close()
 
-def dropbox():
-#Get your app key and secret from the Dropbox developer website
-	app_key = 'pxb85nvmkunftb2'
-	app_secret = 'jls2d3kb3dt1lmj'
+def send_to_dropbox():
 
-	flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
-	authorize_url = flow.start()
-
+	"""sends file of pre_sorted_tutors.csv to dropbox cloud storage"""
 	print '1. Go to: ' + authorize_url
 	print '2. Click "Allow" (you might have to log in first)'
 	print '3. Copy the authorization code.'
@@ -185,10 +187,10 @@ def dropbox():
 
 	f = open('pre_sort.csv', 'rb')
 	response = client.put_file('/pre_sorted_tutors.csv', f)
-	print 'uploaded: ', response
+	print 'file uploaded to dropbox: ', response
 
 	folder_metadata = client.metadata('/')
-	print 'metadata: ', folder_metadata
+	print 'dropbox folder metadata updated: ', folder_metadata
 
 	f, metadata = client.get_file_and_metadata('pre_sorted_tutors.csv')
 	out = open('pre_sorted_tutors.csv', 'wb')
@@ -203,11 +205,10 @@ def main():
 	print "Welcome to BUILD's Sort-o-Matic!"
 	tutor_avail = prospective_tutors()
 	site_avail = BUILD_sites()
-
 	stimes_list = sorting_sites(site_avail, tutor_avail)
 	output_csv(stimes_list)
-	#app.run(debug=True)
-	dropbox()
+	app.run(debug=True)
+	send_to_dropbox()
 
 if __name__=="__main__":
 
