@@ -1,8 +1,34 @@
 import csv
 from operator import itemgetter
+from flask import Flask, render_template, request, jsonify
+
+# Include the Dropbox SDK
+import dropbox
+
+
+
+# app = Flask(__name__) # Initialize the app. launches server.
+
+
+#Flask functions
+# @app.route('/')
+# def hello_world():
+#     return "Welcome to BUILD's Sort-o-matic!"
+
+# def shutdown_server():
+#     func = request.environ.get('werkzeug.server.shutdown')
+#     if func is None:
+#         raise RuntimeError('Not running with the Werkzeug Server')
+#     func()
+
+# @app.route('/shutdown', methods=['POST'])
+# def shutdown():
+#     shutdown_server()
+#     return 'Server shutting down...'
+
+#Sort-o-Matic's functions
 
 days = ["Monday", "Tuesday", "Wedensday", "Thursday", "Friday"]
-
 
 def prospective_tutors():
 	"""collects tutors availability schedules from csv,
@@ -11,15 +37,25 @@ def prospective_tutors():
 		tutors = csv.DictReader(f1)
 #fn = tutors.fieldnames
 		tutor_avail = {}
+		
 		for tutor in tutors:
 			tutor_start = []
 			tutor_start.extend([tutor["Monday Start Time"], tutor["Tuesday Start Time"], tutor["Wednesday Start Time"], tutor["Thursday Start Time"], tutor["Friday Start Time"]])
 			tutor_end = []
 			tutor_end.extend([tutor["Monday End Time"], tutor["Tuesday End Time"], tutor["Wednesday End Time"], tutor["Thursday End Time"], tutor["Friday End Time"]])
-			tutor_day_times = zip(days, map(strtime_to_minutes,tutor_start), map(strtime_to_minutes,tutor_end ))
-			tutor_avail[tutor['Last Name']] = tutor_day_times
-		#print tutor_avail
+			tutor_day_times = zip(days, map(strtime_to_minutes,tutor_start), map(strtime_to_minutes,tutor_end ))		
+			
+			if tutor['Willing to Travel?'] == "Yes":
+				tutor_avail[(tutor['Last Name'] + ", " + tutor['First Name']), "**WtT"] = tutor_day_times
+				if tutor["Access to Car"] == "Yes":
+					tutor_avail[(tutor['Last Name'] + ", " + tutor['First Name']), "**WtT +Car"] = tutor_day_times
+			elif tutor["Access to Car"] == "Yes":
+				tutor_avail[(tutor['Last Name'] + ", " + tutor['First Name']), "+Car"] = tutor_day_times
+			else:
+				tutor_avail[(tutor['Last Name'] + "," + tutor['First Name'])] = tutor_day_times
+
 		return tutor_avail
+		
 
 def BUILD_sites():
 	"""collects site availability schedules from csv file,
@@ -47,8 +83,6 @@ def strtime_to_minutes(strtime):
 	else:
 		return -1
 
-# print strtime_to_minutes("10:30")
-# print strtime_to_minutes("blah")
 
 def overlap(interval1, interval2):
 	"""find time overlaps between tutor and sites"""
@@ -84,51 +118,97 @@ def total_overlap(schedule1, schedule2):
 
 def sorting_sites(site_avail,tutor_avail):
 	"""compares site schedules against tutors' schedules"""
-	for site, site_schedule in site_avail.items():
-		times = []
-		for tutor, tutor_schedule in tutor_avail.items():
+	stimes_list = []
+	
+	for tutor, tutor_schedule in tutor_avail.items():
+		#tutor_name = str.join(last_name, first_name)
+		tutor_dict = {}
+		tutor_dict['name'] = tutor
+		for site, site_schedule in site_avail.items():
 			t = total_overlap(tutor_schedule, site_schedule)
+		
 			if t > 60: 
-				times.append((tutor, t))
-				
+				tutor_dict[site] = t
+			
+		#stimes = sorted(times, key=itemgetter(1), reverse=True)
+		stimes_list.append(tutor_dict)
 
-		stimes = sorted(times, key=itemgetter(1), reverse=True)
+		print tutor_dict
+
+		#print site, ": ", stimes
+	return stimes_list
+
+def output_csv(stimes):
+	"""outputs sorted sites as csv file"""
+
+	#file_name = raw_input("save file as?")
+	key = stimes[0].keys()
+	key.remove("name")
+	key.insert(0, "name")
+
+	with open('pre_sort.csv', "wb") as f3:
+		writer = csv.writer(f3, delimiter=',')
+		writer.writerow(key)
+
+		for row in stimes:
+			t = []
+			for k in key:
+				minutes = row.get(k, 0)
+				t.append(minutes)
 
 	
-		print site, ": ", stimes
+			# name, hour, minutes = t
+			# print "{} hour(s) and {} minutes".format(hour, minutes)
 
+			writer.writerow(t)
 
-# def tutors_who_travel():
-# 	#loops through data to search for tutors who are willing to travel to oakland & who have cars
-# 	"""pulls out schedules of tutors who are willing travel to Oakland"""
-# 	oakland_tutors = {}
-# 	oakland_sites = {}
+		#writer.close()
 
-# 	for tutor in tutors:
-# 		if tutor['Willing to Travel?'] == "Yes":
-# 			oakland_tutors.append(tutor)
+def dropbox():
+#Get your app key and secret from the Dropbox developer website
+	app_key = 'pxb85nvmkunftb2'
+	app_secret = 'jls2d3kb3dt1lmj'
 
-# 	for site in site_times:
-# 		if site['city'] == "Oakland":
-# 			oakland_sites.append(site)
+	flow = dropbox.client.DropboxOAuth2FlowNoRedirect(app_key, app_secret)
+	authorize_url = flow.start()
 
-# 	oakland_schedules = {}
-# 	for tutor in oakland_tutors:
-# 		if overlap(oakland_sites, oakland_tutors) > 60:
-# 			oakland_schedules.extend(sorting_sites(oakland_sites, oakland_tutors))
-	 
-# 	print "availability for oakland: ", oakland_schedules
+	print '1. Go to: ' + authorize_url
+	print '2. Click "Allow" (you might have to log in first)'
+	print '3. Copy the authorization code.'
+	code = raw_input("Enter the authorization code here: ").strip()
+
+	# This will fail if the user enters an invalid authorization code
+	access_token, user_id = flow.finish(code)
+
+	client = dropbox.client.DropboxClient(access_token)
+	print 'linked account: ', client.account_info()
+
+	f = open('pre_sort.csv', 'rb')
+	response = client.put_file('/pre_sorted_tutors.csv', f)
+	print 'uploaded: ', response
+
+	folder_metadata = client.metadata('/')
+	print 'metadata: ', folder_metadata
+
+	f, metadata = client.get_file_and_metadata('pre_sorted_tutors.csv')
+	out = open('pre_sorted_tutors.csv', 'wb')
+	out.write(f.read())
+	out.close()
+	print metadata
+
 
 
 def main():
+	
 	print "Welcome to BUILD's Sort-o-Matic!"
-
 	tutor_avail = prospective_tutors()
 	site_avail = BUILD_sites()
-	
-	#tutors_who_travel()
-	sorting_sites(site_avail, tutor_avail)
-	
+
+	stimes_list = sorting_sites(site_avail, tutor_avail)
+	output_csv(stimes_list)
+	#app.run(debug=True)
+	dropbox()
 
 if __name__=="__main__":
+
     main()

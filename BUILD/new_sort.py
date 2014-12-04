@@ -5,32 +5,45 @@ days = ["Monday", "Tuesday", "Wedensday", "Thursday", "Friday"]
 
 def open_tutors():
 	"""opens tutors availability schedules from csv, """
-	with open('BUILD_DataTest2.csv') as f1:
-		tutors_data = csv.DictReader(f1)
-		#fn = tutors.fieldnames
-		for tutors in tutors_data:
+	try:
+		with open('BUILD_DataTest2.csv') as f1:
+			tutors_data = csv.DictReader(f1)
+			tutors = []
+			for tutors_list in tutors_data:
+				tutors.append(tutors_list)
+
 			return tutors
+
+	except: 
+		print "Is the BUILD prospective tutors excel file file saved as BUILD_DataTest2.csv \
+		and saved in the BUILD folder? "
+		exit()
+		#fn = tutors.fieldnames
 
 def open_site():
 	"""	opens site availability schedules from csv file	"""
 	with open('BUILD_SiteTimes2.csv') as f2:
 		site_times_data = csv.DictReader(f2)
-		for site_times in site_times_data:
-			return site_times
 
+		site_times = []
+		for site_times_list in site_times_data:
+			site_times.append(site_times_list)
+
+		return site_times
 	
 def prospective_tutors(tutors):
 	"""creates tutor availabilty schedules in tuples of day, start/end time ranges"""
 	tutor_avail = {}
 
 	for tutor in tutors:
-		return tutors
-
+		
 		tutor_start = []
 		tutor_start.extend([tutor["Monday Start Time"], tutor["Tuesday Start Time"], tutor["Wednesday Start Time"], tutor["Thursday Start Time"], tutor["Friday Start Time"]])
 		tutor_end = []
+
 		tutor_end.extend([tutor["Monday End Time"], tutor["Tuesday End Time"], tutor["Wednesday End Time"], tutor["Thursday End Time"], tutor["Friday End Time"]])
 		tutor_day_times = zip(days, map(strtime_to_minutes,tutor_start), map(strtime_to_minutes,tutor_end ))
+		
 		tutor_avail[tutor['Last Name']] = tutor_day_times
 
 	return tutor_avail
@@ -92,60 +105,81 @@ def total_overlap(schedule1, schedule2):
 		total += t
 	return total
 
-
 def sorting_sites(site_avail,tutor_avail):
 	"""compares site schedules against tutors' schedules"""
-	for site, site_schedule in site_avail.items():
-		times = []
-		for tutor, tutor_schedule in tutor_avail.items():
+	stimes_list = []
+
+	for tutor, tutor_schedule in tutor_avail.items():
+		tutor_dict = {}
+		tutor_dict['name'] = tutor
+		for site, site_schedule in site_avail.items():
 			t = total_overlap(tutor_schedule, site_schedule)
 			if t > 60: 
-				times.append((tutor, t))
-				
+				tutor_dict[site] = divmod(t, 60)
+			
+		#stimes = sorted(times, key=itemgetter(1), reverse=True)
+		stimes_list.append(tutor_dict)
 
-		stimes = sorted(times, key=itemgetter(1), reverse=True)
-		
-		return site
-		return stimes
-		print site, ": ", stimes
+		print tutor_dict
+
+		#print site, ": ", stimes
+	return stimes_list
 
 
-def tutors_who_travel(tutors, site_times):
-	#loops through data to search for tutors who are willing to travel to oakland & who have cars
-	"""pulls out schedules of tutors who are willing travel to Oakland"""
-	oakland_tutors = {}
-	oakland_sites = {}
+# def tutors_who_travel(tutors, site_times):
+# 	#loops through data to search for tutors who are willing to travel to oakland & who have cars
+# 	"""pulls out schedules of tutors who are willing travel to Oakland"""
+# 	oakland_tutors = {}
+# 	oakland_sites = {}
 
-	for tutor in tutors:
-		if tutor['Willing to Travel?'] == "Yes":
-			oakland_tutors.append(tutor)
+# 	for tutor in tutors:
+# 		if tutor['Willing to Travel?'] == "Yes":
+# 			oakland_tutors.append(tutor)
 
-	for site in site_times:
-		if site['city'] == "Oakland":
-			oakland_sites.append(site)
+# 	for site in site_times:
+# 		if site['city'] == "Oakland":
+# 			oakland_sites.append(site)
 
-	oakland_schedules = {}
-	for tutor in oakland_tutors:
-		if overlap(oakland_sites, oakland_tutors) > 60:
-			oakland_schedules.extend(sorting_sites(oakland_sites, oakland_tutors))
+# 	oakland_schedules = {}
+# 	for tutor in oakland_tutors:
+# 		if overlap(oakland_sites, oakland_tutors) > 60:
+# 			oakland_schedules.extend(sorting_sites(oakland_sites, oakland_tutors))
 	 
-	print "availability for oakland: ", oakland_schedules
+# 	print "availability for oakland: ", oakland_schedules
 
 
-def write_schedule_csv():
-	"""write sorted schedules to csv file"""
-	pass
+
+def output_csv(stimes):
+	"""outputs sorted sites as csv file"""
+
+	#file_name = raw_input("save file as?")
+	key = stimes[0].keys()
+	key.remove("name")
+	key.insert(0, "name")
+
+	with open('pre_sort.csv', "wb") as f3:
+		writer = csv.writer(f3, delimiter=',')
+		writer.writerow(key)
+
+		for row in stimes:
+			t = []
+			for k in key:
+				t.append(row.get(k, "N/A"))
+
+			writer.writerow(t)
 
 
 def main():
 	print "Welcome to BUILD's Sort-o-Matic!"
 	tutors = open_tutors()
 	site_times = open_site()
+
 	tutor_avail = prospective_tutors(tutors)
 	site_avail = BUILD_sites(site_times)
 	
 	#tutors_who_travel(tutors, site_times)
-	sorting_sites(site_avail, tutor_avail)
+	stimes_list = sorting_sites(site_avail, tutor_avail)
+	output_csv(stimes_list)
 	
 
 if __name__=="__main__":
